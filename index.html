@@ -44,11 +44,12 @@
 			<div class="slides">
 				<section>
 					<h1>Boost Magento perfomance with queues</h1>
-                    <br />
+                    <br /><br /><br />
                     <img src="img/avatar.jpeg" alt="Gravatar" style="float:left; margin-right: 15px; margin-top: 0;"/>
                     <p style="overflow: hidden; text-align: left;">
                         <small>
                             <strong>Manuele Menozzi</strong><br />
+							<br />
                             Senior PHP Developer @ <a href="http://www.webgriffe.com/">Webgriffe®</a><br />
 							Zend Certified PHP Engineer<br />
                             Proud <a href="http://www.grusp.it/">GrUSP</a> & <a href="http://more.grusp.org">PUG MoRe</a> member<br />
@@ -59,32 +60,47 @@
 				</section>
 
 				<section>
-					<h2>Scenarios</h2>
+					<h2>Performance improvments</h2>
+
+					<p>Save 30% of the time by queuing indexing operations on product save</p>
 					<br/>
-					<img src="img/diagram1.png" alt="Frontend + DB" />
+					<p>
+						<small>Magento CE v. 1.8.1.0 with sample data. Index update on save <strong><u>enabled</u></strong>.</small>
+					</p>
+
+					<img src="" alt="with/without index queue product save diagram" />
+
+					<p>
+						<small>Data collected with Xhprof profiler</small>
+					</p>
 				</section>
 
 				<section>
-					<h2>Scenarios</h2>
+					<h2>Simple Scenario</h2>
 					<br/>
-					<img src="img/diagram4.png" alt="2 Frontends, load balancer, cache, media, backend &amp; DB" style="width:100%;" />
+					<img src="" alt="all-in-one" style="width:100%;" />
+				</section>
+
+				<section>
+					<h2>Complex Scenario</h2>
+					<br/>
+					<img src="" alt="all-separated" style="width:100%;" />
 				</section>
 
 				<section>
 					<h2>Have we reached the real limit?</h2>
 					<br />
-					<h3>No: queueing syncrounous tasks allows us to go further!</h3>
+					<h3 class="fragment">No: queueing any syncrounous tasks allows us to go further!</h3>
 				</section>
 
 				<section>
-					<h2>Queues are for&hellip;</h2>
+					<h2>Separation of components with Queue Manager &amp; Workers</h2>
 					<br/>
+					<img src="img/diagram6.png" alt="Responsibilites" />
+					<br/><br/>
 					<ul>
-						<li>Reindexing</li>
-						<li>Cache cleaning</li>
-						<li>Rendering email templates</li>
-						<li>&hellip;</li>
-						<li>Any task which the user doesn't need to wait for</li>
+						<li>Queue Manager: collects &amp; assigns tasks to workers</li>
+						<li>Workers: execute tasks (with repeat-until logic)</li>
 					</ul>
 				</section>
 
@@ -124,27 +140,21 @@
 				</section>
 
 				<section>
-					<h2>Responsibilities</h2>
-					<br/>
-					<img src="img/diagram6.png" alt="Responsibilites" />
-					<br/><br/>
-					<ul>
-						<li>Queue Manager: collect tasks</li>
-						<li>Worker: execute tasks (with repeat-until logic)</li>
-					</ul>
-				</section>
+					<h2>For example: update index</h2>
 
-				<section>
-					<h2>An Example</h2>
+					<br/>
+
 					<h3>
 						Queueing<br/>
 						Magento Indexing Operations
 					</h3>
 
 					<p>
-						Working open source code on GitHub
+						Open source code on GitHub
 						<br />
 						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
+						<br /><br />
+						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
 					</p>
 				</section>
 
@@ -152,59 +162,28 @@
 					<h2>Index Queue Extension</h2>
 					<h3>Architecture</h3>
 
-					<img src="img/ext-architecture.png" alt="Architecture" />
+					<img src="" alt="Index Queue Extension Architecture" />
 				</section>
 
 				<section>
-					<h2>Result</h2>
-
-					<p>
-						<small>Product save in Magento (v. 1.8.1.0) admin panel with sample data</small>
-					</p>
-
-					<p>
-						With queueing <strong>disabled</strong><br/>
-						<img src="img/without-queue.png" alt="Without Queueing" />
-					</p>
+					<h2>The same can be done with other components or tasks</h2>
+					<br/>
+					<div class="fragment">
+						<h3>Queues are for&hellip;</h3>
+						<ul>
+							<li>Reindexing</li>
+							<li>Cache cleaning</li>
+							<li>Rendering email templates</li>
+							<li>&hellip;</li>
+							<li>Any task which the user doesn't need to wait for</li>
+						</ul>
+					</div>
 				</section>
 
 				<section>
-					<h2>Result</h2>
-
-					<p>
-						<small>Product save in Magento (v. 1.8.1.0) admin panel with sample data</small>
-					</p>
-
-					<p>
-						With queueing <strong>enabled</strong><br/>
-						<img src="img/with-queue.png" alt="With Queueing" />
-					</p>
-				</section>
-
-				<section>
-					<h2>Result</h2>
-
-					<p>
-						<small>Product save in Magento (v. 1.8.1.0) admin panel with sample data</small>
-					</p>
-
-					<p>
-						With queueing <strong>disabled</strong><br/>
-						<img src="img/without-queue-detail.png" alt="Without Queueing Detail" />
-					</p>
-				</section>
-
-				<section>
-					<h2>Result</h2>
-
-					<p>
-						<small>Product save in Magento (v. 1.8.1.0) admin panel with sample data</small>
-					</p>
-
-					<p>
-						With queueing <strong>enabled</strong><br/>
-						<img src="img/with-queue-detail.png" alt="With Queueing Detail" />
-					</p>
+					<h2>Q&amp;A</h2>
+					<h3>?</h3>
+					<h2 class="fragment">Thank you!</h2>
 				</section>
 			</div>
 
