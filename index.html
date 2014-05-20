@@ -16,6 +16,7 @@
 
 		<link rel="stylesheet" href="css/reveal.min.css">
 		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+		<link rel="stylesheet" href="css/theme/custom.css">
 
 		<!-- For syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -38,12 +39,12 @@
 
 	<body>
 
-		<div class="reveal">
+		<div class="reveal theme-font-league">
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>Boost Magento perfomance with queues</h1>
+					<h1>Boost <span class="orange">Magento</span> Perfomance with <span class="orange">Queues</span></h1>
                     <br /><br /><br />
                     <img src="img/avatar.jpeg" alt="Gravatar" style="float:left; margin-right: 15px; margin-top: 0;"/>
                     <p style="overflow: hidden; text-align: left;">
@@ -60,41 +61,43 @@
 				</section>
 
 				<section>
-					<h2>Performance improvments</h2>
-
-					<p>Save 30% of the time by queuing indexing operations on product save</p>
-					<br/>
-					<p>
-						<small>Magento CE v. 1.8.1.0 with sample data. Index update on save <strong><u>enabled</u></strong>.</small>
-					</p>
-
-					<img src="" alt="with/without index queue product save diagram" />
-
-					<p>
-						<small>Data collected with Xhprof profiler</small>
-					</p>
-				</section>
-
-				<section>
 					<h2>Simple Scenario</h2>
 					<br/>
-					<img src="" alt="all-in-one" style="width:100%;" />
+					<img src="img/schermata2.png" alt="all-in-one" />
+
+					<aside class="notes">
+						Magento è composto da diversi componenti logici: frontend, backend, database, media, cache e search engine. Nelle situazioni più semplici questi ruoli vengono svolti solitamente dalla stessa macchina server (fisica o virtuale che sia).
+					</aside>
 				</section>
 
 				<section>
 					<h2>Complex Scenario</h2>
 					<br/>
-					<img src="" alt="all-separated" style="width:100%;" />
+					<img src="img/schermata3.png" alt="all-separated" />
+
+					<aside class="notes">
+						Al crescere delle esigenze però, può essere necessario separare questi ruoli su diverse macchine. Questo è possibile perché l'architettura software di Magento è stata progettata per rendere separabili anche fisicamente questi componenti logici. Quindi possiamo andare verso architetture molto più complesse, dove ogni ruolo è svolto da una o più macchine separate. Ad esempio possiamo costruire una infrastruttura come quella mostrata dove dietro un load balancer / reverse proxy sono presenti 2 frontend server e dove abbiamo 1 cluster MySQL per il database, 1 caching server, 1 backend server, 1 search engine server ed un media storage (magari in CDN). Tutto questo utilizzando le funzionalità native di Magento.
+					</aside>
 				</section>
 
 				<section>
-					<h2>Have we reached the real limit?</h2>
+					<h2>Have we reached the <span class="orange">real limit</span>?</h2>
 					<br />
-					<h3 class="fragment">No: queueing any syncrounous tasks allows us to go further!</h3>
+					<h3 class="fragment">No!</h3>
+					<p class="fragment">
+						Queueing several syncrounous tasks allows us to go further.
+					</p>
+
+					<aside class="notes">
+						A questo punto ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altri componenti logici, non identificati da chi ha progettato il core, e renderli separabili anche fisicamente? E farlo senza modificare il core?
+						Ovvero, con infrastrutture come la precedente, abbiamo raggiunto il limite?
+
+						La risposta è no: mettendo in coda diverse (poi vederemo quali) operazioni sincrone possiamo andare oltre questo limite.
+					</aside>
 				</section>
 
 				<section>
-					<h2>Separation of components with Queue Manager &amp; Workers</h2>
+					<h2>Separation of components with <span class="orange">Queue Manager</span> &amp; <span class="orange">Workers</span></h2>
 					<br/>
 					<img src="img/diagram6.png" alt="Responsibilites" />
 					<br/><br/>
@@ -102,6 +105,63 @@
 						<li>Queue Manager: collects &amp; assigns tasks to workers</li>
 						<li>Workers: execute tasks (with repeat-until logic)</li>
 					</ul>
+
+					<aside class="notes">
+						Il concetto è molto semplice. Si prende la nostra attuale infrasttura Magento, qualunque sia la sua complessità, e la si collega ad un motore di code che recepisce le operazioni che gli vengono comunicate e le assegna ad uno o più worker che eseguiranno le operazioni. I vari worker possono essere separati anche fisicamente su macchine diverse. Inoltre, generalmente, i motori di code hanno logiche abbastanza sofisticate e configurabili sull'assegnazione dei task ai worker collegati.
+
+						Quindi, il primo aspetto che occorre notare è quello che attraverso l'introduzione di un motore di code abbiamo la libertà di identificare e separare nuovi componenti logici della nostra applicazione e, volendo, separarli anche fisicamente dal resto riducendo in questo modo il carico sulle altre macchine.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Performance improvments</h2>
+
+					<p>Save <span class="orange">30% of the time</span> by queuing index update on product save</p>
+
+					<img src="img/schermata1c-cropped.png" alt="with/without index queue product save diagram" />
+
+					<p style="margin-top:18px;">
+						<small><em>Magento CE v. 1.8.1.0 with sample data. Index update on save enabled. Data collected with Xhprof profiler.</em></small>
+					</p>
+
+					<aside class="notes">
+
+					</aside>
+				</section>
+
+				<section>
+					<h3>Online Hackathon Worldwide Experience</h3>
+					<small><a href="https://www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html">www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html</a></small>
+					<br/><br/>
+					<ul>
+						<li>
+							Beanstalk<br/>
+							(<a href="http://kr.github.io/beanstalkd/">kr.github.io/beanstalkd</a>)
+						</li>
+						<li>
+							Lilmuckers_Queue<br/>
+							(<a href="https://github.com/lilmuckers/magento-lilmuckers_queue">github.com/lilmuckers/magento-lilmuckers_queue</a>)
+						</li>
+						<li>Your custom logic</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Queueing Magento Index Update</h3>
+
+					<br/>
+
+					<h3>
+
+					</h3>
+
+					<p>
+						Open source code on GitHub
+						<br />
+						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
+						<br /><br />
+						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
+					</p>
 				</section>
 
 				<section>
@@ -123,67 +183,37 @@
 				</section>
 
 				<section>
-					<h2>Online Hackathon Worldwide Experience</h2>
-					<small><a href="https://www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html">www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html</a></small>
-					<br/><br/>
-					<ul>
-						<li>
-							Beanstalk<br/>
-							(<a href="http://kr.github.io/beanstalkd/">kr.github.io/beanstalkd</a>)
-						</li>
-						<li>
-							Lilmuckers_Queue<br/>
-							(<a href="https://github.com/lilmuckers/magento-lilmuckers_queue">github.com/lilmuckers/magento-lilmuckers_queue</a>)
-						</li>
-						<li>Your custom logic</li>
-					</ul>
-				</section>
-
-				<section>
-					<h2>For example: update index</h2>
-
-					<br/>
-
-					<h3>
-						Queueing<br/>
-						Magento Indexing Operations
-					</h3>
-
-					<p>
-						Open source code on GitHub
-						<br />
-						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
-						<br /><br />
-						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
-					</p>
-				</section>
-
-				<section>
 					<h2>Index Queue Extension</h2>
-					<h3>Architecture</h3>
+					<p>Architecture</p>
 
 					<img src="" alt="Index Queue Extension Architecture" />
 				</section>
 
 				<section>
-					<h2>The same can be done with other components or tasks</h2>
+					<h2>
+						The same can be done with
+						<span class="orange">other components</span>
+						or
+						<span class="orange">tasks</span>
+					</h2>
 					<br/>
-					<div class="fragment">
-						<h3>Queues are for&hellip;</h3>
-						<ul>
-							<li>Reindexing</li>
-							<li>Cache cleaning</li>
-							<li>Rendering email templates</li>
-							<li>&hellip;</li>
-							<li>Any task which the user doesn't need to wait for</li>
-						</ul>
+					<div class="fragment" style="text-align:left;">
+						<div style="width:680px; margin:0 auto;">
+							<h3>Queues are for&hellip;</h3>
+							<ul>
+								<li>Reindexing</li>
+								<li>Cache cleaning</li>
+								<li>Rendering email templates</li>
+								<li>&hellip;</li>
+								<li>Any task which the user doesn't need to wait for</li>
+							</ul>
+						</div>
 					</div>
 				</section>
 
 				<section>
-					<h2>Q&amp;A</h2>
-					<h3>?</h3>
-					<h2 class="fragment">Thank you!</h2>
+					<h2>Any questions?</h2>
+					<h2 class="fragment"><span class="orange">Thank you!</span></h2>
 				</section>
 			</div>
 
@@ -203,7 +233,7 @@
 				center: true,
 
 				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+				transition: 'fade', // default/cube/page/concave/zoom/linear/fade/none
 
 				// Parallax scrolling
 				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',

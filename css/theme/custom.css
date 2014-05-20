@@ -1,0 +1,24 @@
+html body {
+    background:url("../../img/nuovobg.jpg");
+    background-position:center;
+	background-size: 100%;
+}
+
+.reveal h1 {
+    
+}
+
+.orange {
+    color: #FF9900;
+}
+
+.reveal section img {
+    border:0 none;
+    background: transparent;
+    box-shadow:none;
+}
+
+.reveal a:not(.image),
+.reveal a {
+    color: #7cc1ff;
+}
