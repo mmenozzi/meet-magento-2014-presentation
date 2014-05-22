@@ -5,7 +5,7 @@ html body {
 }
 
 .reveal h1 {
-    
+
 }
 
 .orange {
@@ -21,4 +21,17 @@ html body {
 .reveal a:not(.image),
 .reveal a {
     color: #7cc1ff;
+}
+
+.reveal pre {    
+    background: transparent;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+.reveal pre code {
+    background: transparent;
+    -webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
 }

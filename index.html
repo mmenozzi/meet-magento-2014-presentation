@@ -66,7 +66,7 @@
 					<img src="img/schermata2.png" alt="all-in-one" />
 
 					<aside class="notes">
-						Magento è composto da diversi componenti logici: frontend, backend, database, media, cache e search engine. Nelle situazioni più semplici questi ruoli vengono svolti solitamente dalla stessa macchina server (fisica o virtuale che sia).
+						Magento è composto da diverse componenti logiche: frontend, backend, database, media, cache e search engine. Nelle situazioni più semplici questi ruoli vengono svolti solitamente dalla stessa macchina server (fisica o virtuale che sia).
 					</aside>
 				</section>
 
@@ -76,7 +76,7 @@
 					<img src="img/schermata3.png" alt="all-separated" />
 
 					<aside class="notes">
-						Al crescere delle esigenze però, può essere necessario separare questi ruoli su diverse macchine. Questo è possibile perché l'architettura software di Magento è stata progettata per rendere separabili anche fisicamente questi componenti logici. Quindi possiamo andare verso architetture molto più complesse, dove ogni ruolo è svolto da una o più macchine separate. Ad esempio possiamo costruire una infrastruttura come quella mostrata dove dietro un load balancer / reverse proxy sono presenti 2 frontend server e dove abbiamo 1 cluster MySQL per il database, 1 caching server, 1 backend server, 1 search engine server ed un media storage (magari in CDN). Tutto questo utilizzando le funzionalità native di Magento.
+						Al crescere delle esigenze però, può essere necessario separare questi ruoli su diverse macchine. Questo è possibile perché l'architettura software di Magento è stata progettata per rendere separabili anche fisicamente queste componenti logiche. Quindi possiamo andare verso architetture molto più complesse, dove ogni ruolo è svolto da una o più macchine separate. Ad esempio possiamo costruire una infrastruttura come quella mostrata dove dietro un load balancer / reverse proxy sono presenti 2 frontend server e dove abbiamo 1 cluster MySQL per il database, 1 caching server, 1 backend server, 1 search engine server ed un media storage (magari in CDN). Tutto questo utilizzando le funzionalità native di Magento.
 					</aside>
 				</section>
 
@@ -89,7 +89,7 @@
 					</p>
 
 					<aside class="notes">
-						A questo punto ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altri componenti logici, non identificati da chi ha progettato il core, e renderli separabili anche fisicamente? E farlo senza modificare il core?
+						A questo punto ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altre componenti logiche, non identificate da chi ha progettato il core, e renderle separabili anche fisicamente? E farlo senza modificare il core?
 						Ovvero, con infrastrutture come la precedente, abbiamo raggiunto il limite?
 
 						La risposta è no: mettendo in coda diverse (poi vederemo quali) operazioni sincrone possiamo andare oltre questo limite.
@@ -109,12 +109,12 @@
 					<aside class="notes">
 						Il concetto è molto semplice. Si prende la nostra attuale infrasttura Magento, qualunque sia la sua complessità, e la si collega ad un motore di code che recepisce le operazioni che gli vengono comunicate e le assegna ad uno o più worker che eseguiranno le operazioni. I vari worker possono essere separati anche fisicamente su macchine diverse. Inoltre, generalmente, i motori di code hanno logiche abbastanza sofisticate e configurabili sull'assegnazione dei task ai worker collegati.
 
-						Quindi, il primo aspetto che occorre notare è quello che attraverso l'introduzione di un motore di code abbiamo la libertà di identificare e separare nuovi componenti logici della nostra applicazione e, volendo, separarli anche fisicamente dal resto riducendo in questo modo il carico sulle altre macchine.
+						Quindi, il primo aspetto che occorre notare è che attraverso l'introduzione di un motore di code abbiamo la libertà di identificare e separare nuove componenti logiche della nostra applicazione e, volendo, separarli anche fisicamente dal resto riducendo in questo modo il carico sulle altre macchine.
 					</aside>
 				</section>
 
 				<section>
-					<h2>Performance improvments</h2>
+					<h2>Response time improvments</h2>
 
 					<p>Save <span class="orange">30% of the time</span> by queuing index update on product save</p>
 
@@ -125,7 +125,17 @@
 					</p>
 
 					<aside class="notes">
+						Inoltre, il secondo aspetto importante sull'utilizzo di un motore di code, è la possibiltà di ottenere significativi miglioramenti sui tempi di risposta.
 
+						Ad esempio questi 2 schemi mostrano il salvataggio di un prodotto dal pannello admin fatta sulla stessa installazione Magento in 2 situazioni differenti. In entrambi i casi parliamo di Magento alla versione 1.8.1.0 con i sample data caricati e l'index update on save attivo.
+
+						Lo schema di sinistra mostra l'operazione su Magento nativo al 100% in cui l'utente clicca sul bottone "Salva", Magento (lato server) comincia ad eseguire le operazioni necessarie ed infine la risposta viene restituita all'utente (che nel frattempo stava "perdendo tempo" aspettando una risposta). Le nostre misurazioni (fatte con Xhprof) ci dicono che tra le operazioni che vengono eseguite lato server, il 30% del tempo viene impiegato dall'operazione di aggiornamento dell'indice per quel prodotto; operazione che non è strettamente necessario sia sincrona.
+
+						Lo schema di destra invece mostra la stessa operazione su una installazione in cui è stato introdotto un motore di code e una opportuna modifica applicativa. Come prima, l'utente clicca sul bottone "Salva", Magento (lato server) esegue le stesse operazioni di prima ma, quando arriva all'index update, questo task viene passato al motore di code che restituisce immediatamente una risposta a Magento che a sua volta restituisce immediatamente la risposta all'utente. Il tempo di passaggio del compito al motore di code è trascurabile quindi questa situazione permette all'utente di risparmiare il 30% del tempo ogni volta che salva un prodotto.
+
+						L'operazione di aggiornamento dell'indice per il prodotto salvato verrà poi eseguita da un worker dedicato che, volendo, può anche lavorare su una macchina separata.
+
+						Vediamo più nel dettaglio come possiamo ottenere questo risultato.
 					</aside>
 				</section>
 
@@ -135,39 +145,27 @@
 					<br/><br/>
 					<ul>
 						<li>
-							Beanstalk<br/>
-							(<a href="http://kr.github.io/beanstalkd/">kr.github.io/beanstalkd</a>)
-						</li>
-						<li>
 							Lilmuckers_Queue<br/>
 							(<a href="https://github.com/lilmuckers/magento-lilmuckers_queue">github.com/lilmuckers/magento-lilmuckers_queue</a>)
 						</li>
+						<li>
+							Beanstalk<br/>
+							(<a href="http://kr.github.io/beanstalkd/">kr.github.io/beanstalkd</a>)
+						</li>
 						<li>Your custom logic</li>
 					</ul>
+
+					<aside class="notes">
+						Questo tipo di ottimizzazioni è stato uno degli argomenti dell'ultimo Online Hackathon Worldwide che si è tenuto lo scorso 31 gennaio e a cui abbiamo partecipato. In sostanza ciò che si proponeva era di utilizzare l'estensione Lilmuckers_Queue per l'integrazione di un motore di code come Beanstalk e di aggiungere logica ad hoc per rendere asincrone alcune operazioni che nativamente non lo sono. Ovviamente prima di procedere è doveroso fare una breve analisi per capire se ciò che si vuole fare abbia senso e sia corretto. Infatti, non tutte le operazioni possono essere rese asincrone in quanto, ad esempio, sono necessarie per generare la risposta; oppure altre operazioni possono non essere così pesanti da giustificare la lavorazione.
+					</aside>
 				</section>
 
 				<section>
-					<h3>Queueing Magento Index Update</h3>
-
-					<br/>
-
-					<h3>
-
-					</h3>
-
-					<p>
-						Open source code on GitHub
-						<br />
-						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
-						<br /><br />
-						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
-					</p>
-				</section>
 
 				<section>
 					<h2>Which queue manager to use?</h2>
 					<br/>
-					<p>The ones we can easly integrate with Magento are:</p>
+					<p>The ones we can <span class="orange">easly integrate with Magento</span> are:</p>
 					<br/>
 					<ul>
 						<li>
@@ -180,13 +178,150 @@
 							Gearman (<a href="http://gearman.org/">gearman.org</a>)
 						</li>
 					</ul>
+
+					<aside class="notes">
+						Attraverso Lilmuckers_Queue è possibile utilizzare qualunque motore, basta implementare il relativo adapter. Già inclusi nel modulo sono presenti 3 adapter per i motori: Beanstalk, Amazon SQS e Gearman.
+					</aside>
 				</section>
 
 				<section>
-					<h2>Index Queue Extension</h2>
+					<h2>Lilmuckers_Queue Extension</h2>
+					<p>Defining a Queue Backend (for example Beanstalk)</p>
+
+					<br />
+
+					<pre><code class="xml" data-trim>
+&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+    &lt;global&gt;
+		...
+        &lt;queue&gt;
+            &lt;backend&gt;beanstalkd&lt;/backend&gt;
+            &lt;beanstalkd&gt;
+                &lt;servers&gt;
+                    &lt;server&gt;
+                        &lt;host&gt;127.0.0.1&lt;/host&gt;
+                    &lt;/server&gt;
+                &lt;/servers&gt;
+            &lt;/beanstalkd&gt;
+        &lt;/queue&gt;
+		...
+    &lt;/global&gt;
+&lt;/config&gt;
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Lilmuckers_Queue Extension</h2>
+					<p>Defining a Queue</p>
+
+					<br />
+
+					<pre><code class="xml" data-trim>
+&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+...
+    &lt;queues&gt;
+        &lt;queueName&gt;
+            &lt;label&gt;The Queue Name&lt;/label&gt;
+            &lt;class&gt;module/queueHandler&lt;/class&gt;
+            &lt;workers&gt;
+                &lt;taskName&gt;
+                    &lt;class&gt;module/worker&lt;/class&gt;
+                    &lt;method&gt;methodName&lt;/method&gt;
+                &lt;/taskName&gt;
+            &lt;/workers&gt;
+        &lt;/queueName&gt;
+    &lt;/queues&gt;
+...
+&lt;/config&gt;
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Lilmuckers_Queue Extension</h2>
+					<p>Adding tasks to Queue</p>
+
+					<br />
+
+					<pre><code class="php" data-trim>
+$_queue = Mage::helper('lilqueue')->getQueue('queueName');
+$_task = Mage::helper('lilqueue')->createTask(
+	'taskName',
+	array('data'=>'to provide', 'to'=>'the worker'),
+	$storeToRunAs
+);
+
+// Optionally
+$_task->setPriority(100)
+    ->setDelay(60)
+    ->setTtr(60);
+
+$_queue->addTask($_task);
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Lilmuckers_Queue Extension</h2>
+					<p>Worker</p>
+
+					<br />
+
+					<pre><code class="php" data-trim>
+class My_Module_Model_Worker extends Lilmuckers_Queue_Model_Worker_Abstract
+{
+    public function methodName(Lilmuckers_Queue_Model_Queue_Task $task)
+    {
+        //get the store assigned with the task
+        $store = $task->getStore();
+        //get the queue handler for this queue
+        $queue = $task->getQueue();
+        //get the data assigned with the task
+        $data = $task->getData();
+        //This task ended properly
+        $task->success();
+        //this task needs to be repeated
+        $task->retry();
+        //this task errored and we should drop it from the queue
+        $task->hold();
+        //this worker is taking a long time, we should extend it
+        $task->touch();
+    }
+}
+					</code></pre>
+					<pre><code class="bash" data-trim>
+$ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
+					</code></pre>
+				</section>
+				</section>
+
+				<section>
+					<h3>Queueing Magento Index Update</h3>
+
+					<br/>
+
+					<p>
+						Open source code on GitHub
+						<br />
+						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
+						<br /><br />
+						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
+					</p>
+
+					<aside class="notes">
+						Dall'esperienza dell'hachathon è quindi nata una estensione open source (disponibile su GitHub) che delega tutte le operazioni di aggiornamento dell'indice su una singola entità ad un motore di code e permette di ottenere quel miglioramento sui tempi di risposta che abbiamo visto prima. E' una estensione open source e utilizzablie gratuitamente. E' provvista di test automatici e di uno script di continous integration. Sulla pagina GitHub del repository è possibile trovare la documentazione sul suo utilizzo e le istruzioni per contribuire. Vediamola un po' più nel dettaglio.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Webgriffe_IndexQueue Extension</h2>
 					<p>Architecture</p>
 
-					<img src="" alt="Index Queue Extension Architecture" />
+					<img src="img/ext-architecture.png" alt="Index Queue Extension Architecture" />
+
+					<aside class="notes">
+						L'estensione riscrive l'Indexer model nativo di Magento che viene richiamato ogni volta che sia necessario aggiornare l'indice per una singola entità (metodo processEntityAction). In questo modo, ogni volta che si cerca di aggiornare l'indice per una singola entità l'estensione può delegare l'operazione a Beanstalk (o altro queue manager) attraverso il relativo Adapter e restituire il controllo all'applicazione in tempo quasi 0. Contemporaneamente e su un processo separato sarà in ascolto l'IndexWorker che, sempre tramite l'Adapter, riceverà il task e lo eseguirà andando a richiamare l'Indexer model nativo di Magento; ottenendo così l'aggiornamento dell'indice in modo totalemente asincrono.
+					</aside>
 				</section>
 
 				<section>
@@ -197,18 +332,24 @@
 						<span class="orange">tasks</span>
 					</h2>
 					<br/>
-					<div class="fragment" style="text-align:left;">
+					<div style="text-align:left;">
 						<div style="width:680px; margin:0 auto;">
 							<h3>Queues are for&hellip;</h3>
 							<ul>
-								<li>Reindexing</li>
-								<li>Cache cleaning</li>
-								<li>Rendering email templates</li>
-								<li>&hellip;</li>
-								<li>Any task which the user doesn't need to wait for</li>
+								<li>Entity index update</li>
+								<li class="fragment">Cache cleaning</li>
+								<li class="fragment">Rendering email templates</li>
+								<li class="fragment">&hellip;</li>
+								<li class="fragment">Any task which the user doesn't need to wait for</li>
 							</ul>
 						</div>
 					</div>
+
+					<aside class="notes">
+						Lo stesso tipo di implementazione può essere applicata anche ad altre componenti o operazioni che possono essere rese asincrone. Ad esempio è possibile implementare qualcosa di simile per la pulizia della cache, sopratutto nel backend. Infatti, dalle nostre misurazioni, abbiamo notato che, durante il salvataggio di un prodotto in admin, circa il 10% del tempo viene utilizzato per pulire le relative cache per il frontend. Come per l'aggiornamento dell'indice questa operazione non serve all'utente amministratore e si potrebbe quindi rendere asincrona delegandola al motore di code.
+						Anche il rendering e l'invio dei messaggi e-mail (o altri tipi di messaggio come SMS) sono operazioni che possono quasi sempre essere rese asincrone. Benché, solitamente, l'invio effettivo della e-mail venga già reso asincrono dalla maggior parte degli MTA di sistema l'operazione di rendering dei messaggi, a volte, non è così banale e vale quindi la pena renderla asincrona insieme all'invio stesso.
+						Insomma, le possibili applicazioni di questo tipo di ottimizzazione sono diverse e in generale possiamo dire che vale la pena prenderla in considerazione per qualsiasi operazione per cui l'utente non è necessario che aspetti.
+					</aside>
 				</section>
 
 				<section>
