@@ -89,7 +89,7 @@
 					</p>
 
 					<aside class="notes">
-						A questo punto ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altre componenti logiche, non identificate da chi ha progettato il core, e renderle separabili anche fisicamente? E farlo senza modificare il core?
+						Visto che i ruoli possibili sono questi, ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altre componenti logiche, non identificate da chi ha progettato il core, e renderle separabili anche fisicamente? E farlo senza modificare il core?
 						Ovvero, con infrastrutture come la precedente, abbiamo raggiunto il limite?
 
 						La risposta è no: mettendo in coda diverse (poi vederemo quali) operazioni sincrone possiamo andare oltre questo limite.
@@ -99,7 +99,7 @@
 				<section>
 					<h2>Separation of components with <span class="orange">Queue Manager</span> &amp; <span class="orange">Workers</span></h2>
 					<br/>
-					<img src="img/diagram6.png" alt="Responsibilites" />
+					<img src="img/schermata4.png" alt="Responsibilites" />
 					<br/><br/>
 					<ul>
 						<li>Queue Manager: collects &amp; assigns tasks to workers</li>
@@ -305,11 +305,11 @@ $ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
 						<br />
 						<a href="https://github.com/webgriffe/index-queue-extension">github.com/webgriffe/index-queue-extension</a>
 						<br /><br />
-						<img src="https://travis-ci.org/webgriffe/index-queue-extension.svg?branch=master" alt="Travis Build Status" style="border:0 none;" />
+						<img src="img/passing.svg" alt="Travis Build Status" style="border:0 none;" />
 					</p>
 
 					<aside class="notes">
-						Dall'esperienza dell'hachathon è quindi nata una estensione open source (disponibile su GitHub) che delega tutte le operazioni di aggiornamento dell'indice su una singola entità ad un motore di code e permette di ottenere quel miglioramento sui tempi di risposta che abbiamo visto prima. E' una estensione open source e utilizzablie gratuitamente. E' provvista di test automatici e di uno script di continous integration. Sulla pagina GitHub del repository è possibile trovare la documentazione sul suo utilizzo e le istruzioni per contribuire. Vediamola un po' più nel dettaglio.
+						Dall'esperienza dell'hackathon è quindi nata una estensione open source (disponibile su GitHub) che delega tutte le operazioni di aggiornamento dell'indice su una singola entità ad un motore di code e permette di ottenere quel miglioramento sui tempi di risposta che abbiamo visto prima. E' una estensione open source e utilizzablie gratuitamente. E' provvista di test automatici e di uno script di continous integration. Sulla pagina GitHub del repository è possibile trovare la documentazione sul suo utilizzo e le istruzioni per contribuire. Vediamola un po' più nel dettaglio.
 					</aside>
 				</section>
 
@@ -317,7 +317,7 @@ $ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
 					<h2>Webgriffe_IndexQueue Extension</h2>
 					<p>Architecture</p>
 
-					<img src="img/ext-architecture.png" alt="Index Queue Extension Architecture" />
+					<img src="img/schermata5.png" alt="Index Queue Extension Architecture" />
 
 					<aside class="notes">
 						L'estensione riscrive l'Indexer model nativo di Magento che viene richiamato ogni volta che sia necessario aggiornare l'indice per una singola entità (metodo processEntityAction). In questo modo, ogni volta che si cerca di aggiornare l'indice per una singola entità l'estensione può delegare l'operazione a Beanstalk (o altro queue manager) attraverso il relativo Adapter e restituire il controllo all'applicazione in tempo quasi 0. Contemporaneamente e su un processo separato sarà in ascolto l'IndexWorker che, sempre tramite l'Adapter, riceverà il task e lo eseguirà andando a richiamare l'Indexer model nativo di Magento; ottenendo così l'aggiornamento dell'indice in modo totalemente asincrono.
