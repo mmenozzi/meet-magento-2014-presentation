@@ -17,6 +17,7 @@
 		<link rel="stylesheet" href="css/reveal.min.css">
 		<link rel="stylesheet" href="css/theme/night.css" id="theme">
 		<link rel="stylesheet" href="css/theme/custom.css">
+		<link rel="stylesheet" href="css/fullscreen-img.css">
 
 		<!-- For syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -44,6 +45,29 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
+					<section fullscreen-img="img/cover.jpg" fullscreen-size="contain">
+
+					</section>
+					<section>
+						<h3>Webgriffe</h3>
+						<p>
+							Tailored Digital Works
+							<br />
+							<a href="http://www.webgriffe.com/">webgriffe.com</a>
+							|
+							<a href="https://twitter.com/webgriffe">@webgriffe</a>
+						</p>
+						<ul>
+							<li><span class="orange">5+</span> Years of Experience with Magento</li>
+							<li><span class="orange">5</span> Certified Developers (Zend &amp; Magento)</li>
+							<li><span class="orange">350+</span> Customers</li>
+							<li><span class="orange">20+</span> Magento Extensions</li>
+							<li><span class="orange">450+</span> Extensions Sold</li>
+						</ul>
+					</section>
+				</section>
+				<!--
+				<section>
 					<h1>Boost <span class="orange">Magento</span> Perfomance with <span class="orange">Queues</span></h1>
                     <br /><br /><br />
                     <img src="img/avatar.jpeg" alt="Gravatar" style="float:left; margin-right: 15px; margin-top: 0;"/>
@@ -59,6 +83,7 @@
                         </small>
                     </p>
 				</section>
+				-->
 
 				<section>
 					<h2>Simple Scenario</h2>
@@ -81,18 +106,20 @@
 				</section>
 
 				<section>
-					<h2>Have we reached the <span class="orange">real limit</span>?</h2>
+					<h2>Can we go <span class="orange">over this limit</span>?</h2>
 					<br />
-					<h3 class="fragment">No!</h3>
-					<p class="fragment">
-						Queueing several syncrounous tasks allows us to go further.
-					</p>
 
+					<div class="fragment">
+						<h3>Yes!</h3>
+						<p>
+							Queueing several syncrounous tasks allows us to go further.
+						</p>
+					</div>
+					
 					<aside class="notes">
-						Visto che i ruoli possibili sono questi, ci si potrebbe porre la seguente domanda: sarebbe possibile identificare altre componenti logiche, non identificate da chi ha progettato il core, e renderle separabili anche fisicamente? E farlo senza modificare il core?
-						Ovvero, con infrastrutture come la precedente, abbiamo raggiunto il limite?
-
-						La risposta è no: mettendo in coda diverse (poi vederemo quali) operazioni sincrone possiamo andare oltre questo limite.
+						A volte però, anche queste suddivisioni potrebbero non bastare, e sarebbe necessario poter identificare nuove componenti, particolrmente importanti per le nostre logiche di business, e renderle separabili dal resto dell'infrastruttura.
+						Ma possiamo farlo? Possiamo andare oltre il limite progettuale di Magento?
+						La risposta è si e uno dei modi con cui possiamo raggiungere questo obiettivo è sicuramente quello di introdurre un motore di code nella nostra infrastruttura. Infatti, mettendo in coda una operazione, o un gruppo di operazioni, che nativamente sono "sincrone" possiamo andare oltre questo limite.
 					</aside>
 				</section>
 
@@ -142,7 +169,23 @@
 				<section>
 					<h3>Online Hackathon Worldwide Experience</h3>
 					<small><a href="https://www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html">www.mage-hackathon.de/passed/online-hackathon-worldwide-31st-jan-1st-feb.html</a></small>
-					<br/><br/>
+					<br /><br />
+					<ul>
+						<li><span class="orange">4</span> continents</li>
+						<li><span class="orange">10+</span> countries</li>
+						<li><span class="orange">100+</span> people</li>
+					</ul>
+					<br /><br /><br />
+
+					<h4><span class="orange">80+</span> open source Magento projects</h4>
+					<small><a href="https://github.com/magento-hackathon/">github.com/magento-hackathon</a></small>
+					<aside class="notes">
+						Questo tipo di ottimizzazioni è stato uno degli argomenti dell'ultimo Online Hackathon Worldwide che si è tenuto lo scorso 31 gennaio e a cui abbiamo partecipato. E' un evento molto interessante che, in quest'ultima edizione, ha raccolto più di 100 persone da più di 10 paesi sparsi in 4 continenti. Durante i Magento Hackathon passati sono stati sviluppati e rilasciati più di 80 progetti open source alcuni dei quali estremamente utili e famosi (tra cui Magento Composer Installer e Magento PSR0 Autoloader).
+					</aside>
+				</section>
+
+				<section>
+					<h3>Online Hackathon Worldwide Experience</h3>
 					<ul>
 						<li>
 							Lilmuckers_Queue<br/>
@@ -156,7 +199,7 @@
 					</ul>
 
 					<aside class="notes">
-						Questo tipo di ottimizzazioni è stato uno degli argomenti dell'ultimo Online Hackathon Worldwide che si è tenuto lo scorso 31 gennaio e a cui abbiamo partecipato. In sostanza ciò che si proponeva era di utilizzare l'estensione Lilmuckers_Queue per l'integrazione di un motore di code come Beanstalk e di aggiungere logica ad hoc per rendere asincrone alcune operazioni che nativamente non lo sono. Ovviamente prima di procedere è doveroso fare una breve analisi per capire se ciò che si vuole fare abbia senso e sia corretto. Infatti, non tutte le operazioni possono essere rese asincrone in quanto, ad esempio, sono necessarie per generare la risposta; oppure altre operazioni possono non essere così pesanti da giustificare la lavorazione.
+						In sostanza ciò che si proponeva era di utilizzare l'estensione Lilmuckers_Queue per l'integrazione di un motore di code come Beanstalk e di aggiungere logica ad hoc per rendere asincrone alcune operazioni che nativamente non lo sono. Ovviamente prima di procedere è doveroso fare una breve analisi per capire se ciò che si vuole fare abbia senso e sia corretto. Infatti, non tutte le operazioni possono essere rese asincrone in quanto, ad esempio, sono necessarie per generare la risposta; oppure altre operazioni possono non essere così pesanti da giustificare la lavorazione.
 					</aside>
 				</section>
 
@@ -192,6 +235,7 @@
 
 					<pre><code class="xml" data-trim>
 &lt;?xml version="1.0"?&gt;
+&lt;!-- app/etc/local.xml --&gt;
 &lt;config&gt;
     &lt;global&gt;
 		...
@@ -219,6 +263,7 @@
 
 					<pre><code class="xml" data-trim>
 &lt;?xml version="1.0"?&gt;
+&lt;!-- app/code/local/MyVendor/MyModule/etc/config.xml --&gt;
 &lt;config&gt;
 ...
     &lt;queues&gt;
@@ -338,6 +383,7 @@ $ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
 							<ul>
 								<li>Entity index update</li>
 								<li class="fragment">Cache cleaning</li>
+								<li class="fragment">Stock update</li>
 								<li class="fragment">Rendering email templates</li>
 								<li class="fragment">&hellip;</li>
 								<li class="fragment">Any task which the user doesn't need to wait for</li>
@@ -346,15 +392,34 @@ $ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
 					</div>
 
 					<aside class="notes">
-						Lo stesso tipo di implementazione può essere applicata anche ad altre componenti o operazioni che possono essere rese asincrone. Ad esempio è possibile implementare qualcosa di simile per la pulizia della cache, sopratutto nel backend. Infatti, dalle nostre misurazioni, abbiamo notato che, durante il salvataggio di un prodotto in admin, circa il 10% del tempo viene utilizzato per pulire le relative cache per il frontend. Come per l'aggiornamento dell'indice questa operazione non serve all'utente amministratore e si potrebbe quindi rendere asincrona delegandola al motore di code.
-						Anche il rendering e l'invio dei messaggi e-mail (o altri tipi di messaggio come SMS) sono operazioni che possono quasi sempre essere rese asincrone. Benché, solitamente, l'invio effettivo della e-mail venga già reso asincrono dalla maggior parte degli MTA di sistema l'operazione di rendering dei messaggi, a volte, non è così banale e vale quindi la pena renderla asincrona insieme all'invio stesso.
+						Lo stesso tipo di implementazione può essere applicata anche ad altre componenti o operazioni che possono essere rese asincrone. Ad esempio è possibile implementare qualcosa di simile per la pulizia della cache, sopratutto nel backend. Infatti, dalle nostre misurazioni, abbiamo notato che, durante il salvataggio di un prodotto in admin, circa il 10% del tempo viene utilizzato per pulire le relative cache per il frontend. Come per l'aggiornamento dell'indice questa operazione non serve all'utente amministratore e si potrebbe quindi rendere asincrona delegandola al motore di code. Lo stesso discorso vale anche per l'aggiornamento dello stock durante il salvataggio del prodotto in admin.
+						Benché, solitamente, l'invio effettivo dei messaggi e-mail venga già reso asincrono dalla maggior parte degli MTA di sistema, anche il rendering e l'invio dei messaggi e-mail (o altri tipi di messaggio come SMS) sono operazioni che, in alcune situazioni possono essere rese asincrone. Soprattutto l'operazione di rendering dei messaggi, a volte, non è così banale e vale quindi la pena delegarla al sistema di code insieme all'invio stesso.
 						Insomma, le possibili applicazioni di questo tipo di ottimizzazione sono diverse e in generale possiamo dire che vale la pena prenderla in considerazione per qualsiasi operazione per cui l'utente non è necessario che aspetti.
 					</aside>
 				</section>
 
 				<section>
-					<h2>Any questions?</h2>
-					<h2 class="fragment"><span class="orange">Thank you!</span></h2>
+					<h2>Any <span class="orange">Q</span>uestion?</h2>
+					<hr/>
+					<br/><br/>
+					<h3>Webgriffe</h3>
+					<p>
+						Tailored Digital Works
+						<br />
+						<a href="http://www.webgriffe.com/">webgriffe.com</a>
+						|
+						<a href="https://twitter.com/webgriffe">@webgriffe</a>
+					</p>
+					<ul>
+						<li><span class="orange">5+</span> Years of Experience with Magento</li>
+						<li><span class="orange">5</span> Certified Developers (Zend &amp; Magento)</li>
+						<li><span class="orange">350+</span> Customers</li>
+						<li><span class="orange">20+</span> Magento Extensions</li>
+						<li><span class="orange">450+</span> Extensions Sold</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Thank you!</h2>
 				</section>
 			</div>
 
@@ -387,7 +452,8 @@ $ php /path/to/magento/shell/queue.php --watch &lt;queues&gt;
 					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
 					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'lib/js/fullscreen-img.js' },
 				]
 			});
 
